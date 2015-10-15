@@ -1,0 +1,92 @@
+正式的文件，关于使用plotly进行数据可视化的的一些问题和进度。
+
+国庆节期间因为系统的问题进展不大，基本搞清了所需要的模组和基本的环境。决定使用plotly是因为已经有同学成功的实现了一些基本的图。
+
+上周日重装完成系统之后，开始进行plotly的实践。遇到的主要问题有。
+
+1.关于MySQLdb模组的安装和使用。
+
+（1）问题不大，但是因为数据库的掌握不好。所以遇到了一些数据处理上的问题。例如对日期的处理。
+
+（2）关于数据库的连接问题，因为使用navicat进行操作，遇到了一些数据库经常报“UnknownDatabase”的情况。
+
+总体来说问题不大。
+
+2.关于plotly模组的安装和使用。
+
+首先因为拥有Anaconda的集成开发包，所以问题不大。pip直接进行install就可以了。代码的问题也比较容易解决。
+
+但是同样可以在同学那里运行的代码，我却无法显示具体的输出。
+
+对此我表示老师我真的没有偷懒，花了差不多一周时间和环境和基本知识作斗争。
+
+估计可能是因为缺乏基础知识造成了这样的问题。我对此表示很无奈。（然后发现是数据库的数据类型不对。。。。。。）
+
+但是接下来的一段时间我依旧会努力尝试解决这些问题。还是希望老师您能伸出援手。
+
+3.关于具体数据的研究和分析方向。
+
+（1）.首先分析单一用户的贡献数量，按照一定的数量进行分类。
+
+（2）.对一段时间内单一用户的贡献频率进行分析。按照频率大小进行分类。（时间段按年分）
+
+（3）.把处在接近理解范围内的合理数据进行综合，可以得出贡献相对比较高的组织或者个人。
+
+4.总结
+
+因为前两年并没有很用心的学习，现在要努力去补实在是比较困难，但是并没有用比较消极的态度去面对这这问题。老师您是对产业
+
+以及这个学科有着比较深入了解的人。所作所为实际上具有非常深入的目的性，跟着您好好学习半年其实比瞎混几年要便捷的多，所以
+
+我会努力实现您所布置的任务，并且抓紧时间学习。还是希望老师能稍微给点提示，毕竟对于学习这方面实在比较困扰。python的基础知识
+
+还算比较熟，这些并未接触过的事项比较模糊，所以学习肯定是一个过程，不可能一撮而就。例如哪些对于新手和菜鸟比较友好的论坛，知识分享
+
+度比较高的社区您随手指点一下就好~
+
+具体现在对于语言的学习上有着比较深的疑惑，究竟是如何快速并且稳定的掌握一种语言？学习方式上也请老师指点。麻烦了。
+
+以上，因为Github的本地版本貌似有点问题，所以就直接把代码附入本篇内容内。事件的原因，问题还没有彻底的解决。原因是数据库的数据类型
+
+不正确，我正在调试。所以实在抱歉。
+
+以下是代码部分。
+
+# -*- coding: utf-8 -*-
+import MySQLdb
+import pandas as pd
+import plotly.plotly as py
+from plotly.graph_objs import *
+py.sign_in("yegao", "2mb6syhc25")
+#连接到数据库
+conn=MySQLdb.connect(host='127.0.0.1',user='root',passwd='123456',db='mysql',port=3306)
+cursor = conn.cursor()
+
+#从表中获得数据
+cursor.execute('select * from `t_t`');
+
+rows = cursor.fetchall()
+#plotly的数据处理
+str(rows)[0:300]
+df = pd.DataFrame( [[ij for ij in i] for i in rows] )
+df.rename(columns={0: 'TIME', 1: 'TIMES'}, inplace=True);
+df = df.sort(['TIMES'], ascending=[1]);
+
+df.head()
+
+trace1 = Scatter(
+    x=df['TIME'],
+    y=df['TIMES'],
+
+    mode='markers'
+    #作图
+)
+layout = Layout(
+    title='THE numbers that every addresses have scored',
+    xaxis=XAxis( type='log', title='TIME' ),
+    yaxis=YAxis( title='TIMES' ),
+)
+#输出
+data = [trace1]
+fig = Figure(data=data, layout=layout)
+py.plot(fig, filename = 'basic-line')
